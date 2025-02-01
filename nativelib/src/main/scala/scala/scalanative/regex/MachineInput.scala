@@ -32,6 +32,9 @@ abstract class MachineInput {
 
   // Returns the end position in the same units as step().
   def endPos(): Int
+
+  // Returns the start position in the same units as step().
+  def startPos(): Int
 }
 
 object MachineInput {
@@ -120,9 +123,7 @@ object MachineInput {
       if (i < 0) i else i - pos
     }
 
-    override def context(_pos: Int): Int = {
-      var pos = _pos
-      pos += this.start
+    override def context(pos: Int): Int = {
       var r1 = -1
       if (pos > this.start && pos <= this.end) {
         var start = pos - 1
@@ -148,15 +149,14 @@ object MachineInput {
     }
 
     override def endPos(): Int = end
+    override def startPos(): Int = start
   }
 
   // |pos| and |width| are in Java "char" units.
   private class UTF16Input(str: CharSequence, start: Int, end: Int)
       extends MachineInput {
 
-    override def step(_pos: Int): Int = {
-      var pos = _pos
-      pos += start
+    override def step(pos: Int): Int = {
       if (pos < end) {
         val rune = Character.codePointAt(str, pos)
         val nextPos = pos + Character.charCount(rune)
@@ -169,16 +169,12 @@ object MachineInput {
 
     override def canCheckPrefix(): Boolean = true
 
-    override def index(re2: RE2, _pos: Int): Int = {
-      var pos = _pos
-      pos += start
+    override def index(re2: RE2, pos: Int): Int = {
       val i = indexOf(str, re2.prefix, pos)
       if (i < 0) i else i - pos
     }
 
-    override def context(_pos: Int): Int = {
-      var pos = _pos
-      pos += start
+    override def context(pos: Int): Int = {
       val r1 =
         if (pos > start && pos <= end) Character.codePointBefore(str, pos)
         else -1
@@ -187,6 +183,7 @@ object MachineInput {
     }
 
     override def endPos(): Int = end
+    override def startPos(): Int = start
 
     private def indexOf(hayStack: CharSequence, needle: String, pos: Int): Int =
       hayStack match {

@@ -185,7 +185,7 @@ class RE2 private {
 
     val groupMatch = doExecute(
       MachineInput.fromUTF16(input, beg, end),
-      pos - beg,
+      pos,
       anchor,
       2 * ngroup
     )

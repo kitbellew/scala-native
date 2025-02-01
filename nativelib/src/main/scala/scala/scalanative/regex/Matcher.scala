@@ -140,10 +140,6 @@ final class Matcher private (private var _pattern: Pattern) {
     _lastMatchEnd
   }
 
-  // maps relative position within region to absolute
-  private def abspos(offset: Int): Int =
-    if (offset < 0) offset else offset + _regionStart
-
   // Returns the start position of a subgroup of the most recent match.
   //
   // @param group the group index 0 is the overall match
@@ -152,7 +148,7 @@ final class Matcher private (private var _pattern: Pattern) {
   //   if {@code group < 0} or {@code group > groupCount()}
   def start(group: Int): Int = {
     loadGroup(group)
-    abspos(_groups(2 * group))
+    _groups(2 * group)
   }
 
   // Returns the end position of a subgroup of the most recent match.
@@ -163,7 +159,7 @@ final class Matcher private (private var _pattern: Pattern) {
   //   if {@code group < 0} or {@code group > groupCount()}
   def end(group: Int): Int = {
     loadGroup(group)
-    abspos(_groups(2 * group + 1))
+    _groups(2 * group + 1)
   }
 
   private def getNamedGroupOrThrow(key: String, msg: String): Int = {
@@ -413,8 +409,8 @@ final class Matcher private (private var _pattern: Pattern) {
     } else {
       _hasGroups = false
       _anchorFlag = anchor
-      _lastMatchStart = abspos(_groups(0))
-      _lastMatchEnd = abspos(_groups(1))
+      _lastMatchStart = _groups(0)
+      _lastMatchEnd = _groups(1)
       true
     }
   }

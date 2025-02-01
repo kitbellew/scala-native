@@ -135,7 +135,7 @@ class Machine(re2: RE2) {
 
     while (true) {
       if (runq.isEmpty()) {
-        if ((startCond & Utils.EMPTY_BEGIN_TEXT) != 0 && pos != 0) {
+        if ((startCond & Utils.EMPTY_BEGIN_TEXT) != 0 && pos != in.startPos()) {
           // Anchored match, past beginning of text.
           return
         }
@@ -163,7 +163,7 @@ class Machine(re2: RE2) {
         }
       }
 
-      if (!matched && (pos == 0 || anchor == RE2.UNANCHORED)) {
+      if (!matched && (pos == in.startPos() || anchor == RE2.UNANCHORED)) {
         // If we are anchoring at begin then only add threads that begin
         // at |pos| = 0.
         if (matchcap.length > 0) {
@@ -244,7 +244,7 @@ class Machine(re2: RE2) {
 
     // bitmask of EMPTY_* flags
     val flag =
-      if (pos == 0)
+      if (pos == in.startPos())
         Utils.emptyOpContext(-1, rune)
       else
         in.context(pos)
