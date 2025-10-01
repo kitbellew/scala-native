@@ -17,18 +17,23 @@ jobs:
       - name: Check if there are changes since last run
         id: check
         run: |
-          git fetch origin ${LAST_PUBLISHED_TAG} || true
-          PREV_SHA=$(git rev-parse --verify --quiet refs/tags/${LAST_PUBLISHED_TAG}^{commit} 2>/dev/null)
-
-          echo "Previous SHA: $PREV_SHA"
-          echo "Current  SHA: $GITHUB_SHA"
-
-          # Compare
-          if [ "$PREV_SHA" = "$GITHUB_SHA" ]; then
-            echo "No changes since last run."
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
+          if [ \
+            "${{ github.event_name }}" = "push" -a \
+            "${{ github.ref_type }}" = "tag" \
+          ] || ! git fetch origin ${LAST_PUBLISHED_TAG} 2> /dev/null
+          then # if this is a tag push or the tag does not exist
             echo "skip=false" >> $GITHUB_OUTPUT
+          else
+            PREV_SHA=$(git rev-parse --verify --quiet refs/tags/${LAST_PUBLISHED_TAG}^{commit} 2>/dev/null || true)
+            echo "Previous SHA: $PREV_SHA"
+            echo "Current  SHA: $GITHUB_SHA"
+
+            if [ "$PREV_SHA" = "$GITHUB_SHA" ]; then
+              echo "No changes since last run."
+              echo "skip=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
   check-compiles:
