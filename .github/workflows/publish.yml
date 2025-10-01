@@ -24,7 +24,7 @@ jobs:
           then # if this is a tag push or the tag does not exist
             echo "skip=false" >> $GITHUB_OUTPUT
           else
-            PREV_SHA=$(git rev-parse --verify --quiet refs/tags/${LAST_PUBLISHED_TAG}^{commit} 2>/dev/null || true)
+            PREV_SHA=$(git rev-parse --verify --quiet refs/tags/${LAST_PUBLISHED_TAG} 2>/dev/null || true)
             echo "Previous SHA: $PREV_SHA"
             echo "Current  SHA: $GITHUB_SHA"
 
